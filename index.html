@@ -45,20 +45,39 @@
     align-items: center;
     font-size: 2em;
     cursor: pointer;
+    transition: transform 0.5s ease;
   }
 
   .cell:hover {
-    background: #f0f0f0;
+    background: hsl(28, 72%, 60%);
+  }
+  #reset-btn:hover {
+    background-color: #1592e6;
+  }
+
+  .rotate {
+    animation: rotateCell 2s linear infinite;
+  }
+
+  @keyframes rotateCell {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 </style>
 </head>
 <body>
 <div id="board"></div>
+<button id="reset-btn" style="display: none;">Reset Game</button>
 
 <script>
   const board = document.getElementById('board');
+  const resetButton = document.getElementById('reset-btn');
   let currentPlayer = 'X';
-  const cells = Array.from({ length: 9 });
+  let cells = Array.from({ length: 9 });
 
   function render() {
     board.innerHTML = '';
@@ -67,6 +86,9 @@
       cell.classList.add('cell');
       cell.textContent = value || '';
       cell.addEventListener('click', () => handleCellClick(index));
+      if (checkWinner() || cells.every(cell => cell)) {
+        cell.classList.add('rotate');
+      }
       board.appendChild(cell);
     });
   }
@@ -76,8 +98,10 @@
     cells[index] = currentPlayer;
     if (checkWinner()) {
       alert(`Player ${currentPlayer} wins!`);
+      resetButton.style.display = 'block';
     } else if (cells.every(cell => cell)) {
       alert('It\'s a draw!');
+      resetButton.style.display = 'block';
     } else {
       currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
     }
@@ -102,8 +126,14 @@
     });
   }
 
+  resetButton.addEventListener('click', () => {
+    cells = Array.from({ length: 9 });
+    currentPlayer = 'X';
+    resetButton.style.display = 'none';
+    render();
+  });
+
   render();
 </script>
 </body>
 </html>
-
